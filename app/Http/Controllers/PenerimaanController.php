@@ -3,39 +3,80 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Models\Penerimaans;
+use App\Models\Penerimaans;
+use Illuminate\Support\Facades\DB;
+use App\Models\Pendaftarans;
 
-class penerimaanController extends Controller
+class PenerimaanController extends Controller
 {
-/**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-
-        $penerimaan = penerimaan::all();
-        return view('penerimaan.index', compact('penerimaan'));
+        $penerimaan = DB::table('penerimaan')
+            ->join('pendaftaran', 'penerimaan.id_pendaftaran', '=', 'pendaftaran.id')
+            ->select('penerimaan.id as penerimaan_id', 'pendaftaran.nama_santri_baru', 'penerimaan.status_pendaftaran')
+            ->get();
+    
+        $pendaftarans = DB::table('pendaftaran')->get(); // Fetch all pendaftarans
+    
+        return view('admin.pages.admin_penerimaan', compact('penerimaan', 'pendaftarans'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function copyPendaftaranToPenerimaan()
+    {
+        Penerimaans::truncate();
+    
+        $pendaftarans = Pendaftarans::all();
+    
+        foreach ($pendaftarans as $pendaftaran) {
+            Penerimaans::create([
+                'id_pendaftaran' => $pendaftaran->id,
+                'nama_santri_baru' => $pendaftaran->nama_santri_baru,
+                'status_pendaftaran' => null, // No status initially
+            ]);
+        }
+    
+        return redirect()->route('penerimaan.index')
+                         ->with('success', 'Pendaftaran copied to Penerimaan successfully, with the latest data.');
+    }
+
+    public function storeManual(Request $request)
+    {
+        $request->validate([
+            'id_pendaftaran' => 'required|exists:pendaftaran,id', // Validate that id_pendaftaran exists in the pendaftarans table
+            'status_diterima' => 'required|boolean', // Ensure it's either 1 or 0
+        ]);
+    
+        Penerimaans::create([
+            'id_pendaftaran' => $request->id_pendaftaran,
+            'nama_santri_baru' => Pendaftarans::findOrFail($request->id_pendaftaran)->nama_santri_baru,
+            'status_pendaftaran' => $request->status_diterima, // Match the database column name
+        ]);
+    
+        return redirect()->route('penerimaan.index')->with('success', 'Data berhasil ditambahkan.');
+    }
+    
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status_pendaftaran' => 'required|boolean',
+        ]);
+    
+        $penerimaan = Penerimaans::findOrFail($id);
+        $penerimaan->update([
+            'status_pendaftaran' => $request->status_pendaftaran,
+        ]);
+    
+        return redirect()->route('penerimaan.index')->with('success', 'Status berhasil diperbarui.');
+    }
+
+    
     public function create()
     {
-        // Show the form to create a new campaign
         return view('penerimaan.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(Request $request)
     {
  
@@ -44,67 +85,42 @@ class penerimaanController extends Controller
             'description' => 'required|string',
         ]);
 
-        Campaign::create($request->all());
+        Penerimaans::create($request->all());
 
         return redirect()->route('penerimaans.index')
                          ->with('success', 'penerimaan created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\penerimaan  $penerimaan
-     * @return \Illuminate\Http\Response
-     */
-    public function show(penerimaan $penerimaan)
+
+    public function show(Penerimaans $penerimaan)
     {
-        // Show a single penerimaan
         return view('penerimaans.show', compact('penerimaan'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\penerimaan  $penerimaan
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(penerimaan $campaign)
+    public function edit(Penerimaans $campaign)
     {
-        // Show the form to edit an existing penerimaan
         return view('penerimaans.edit', compact('penerimaan'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\penerimaan  $campaign
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, penerimaan $penerimaan)
+
+    public function update(Request $request, Penerimaans $penerimaan)
     {
-        // Validate and update the penerimaan
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
         ]);
 
-        $campaign->update($request->all());
+        $penerimaan->update($request->all());
 
         return redirect()->route('penerimaans.index')
                          ->with('success', 'penerimaan updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\penerimaan  $penerimaan
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(penerimaan $penerimaan)
+
+    public function destroy(Penerimaans $penerimaan)
     {
         // Delete the penerimaan
-        $campaign->delete();
+        $penerimaan->delete();
 
         return redirect()->route('penerimaans.index')
                          ->with('success', 'penerimaan deleted successfully.');

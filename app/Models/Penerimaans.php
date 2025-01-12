@@ -13,4 +13,7 @@ class Penerimaans extends Model
         "nama_santri_baru",
         "status_pendaftaran"
     ];
+
+
+    protected $table = 'penerimaan';
 }

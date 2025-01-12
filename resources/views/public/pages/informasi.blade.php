@@ -11,10 +11,10 @@
             <table class="table-auto w-full border-collapse border border-gray-300">
                 <thead>
                     <tr class="bg-green-600 text-white">
-                    <th class="border border-gray-300 px-4 py-2">No</th>
-                                <th class="border border-gray-300 px-4 py-2">ID</th>
-                                <th class="border border-gray-300 px-4 py-2">Nama</th>
-                                <th class="border border-gray-300 px-4 py-2">Status Diterima</th>
+                        <th class="border border-gray-300 px-4 py-2">No</th>
+                        <th class="border border-gray-300 px-4 py-2">ID</th>
+                        <th class="border border-gray-300 px-4 py-2">Nama</th>
+                        <th class="border border-gray-300 px-4 py-2">Status Diterima</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,6 +23,9 @@
                             <td class="p-3 border border-gray-300 text-center">{{ $key + 1 }}</td>
                             <td class="p-3 border border-gray-300">{{ $data->id }}</td>
                             <td class="p-3 border border-gray-300">{{ $data->nama_santri_baru }}</td>
+                            <td class="p-3 border border-gray-300 text-center">
+                                {{ $data->status_pendaftaran == 1 ? 'Diterima' : 'Tidak Diterima' }}
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

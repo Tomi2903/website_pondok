@@ -1,21 +1,74 @@
-@extends('admin.layouts.app') <!-- Menggunakan layout utama jika ada -->
+@extends('admin.layouts.app')
 
 @section('content')
-<nav class="w-1/4 bg-green-700 text-white min-h-screen p-4">
-    <div class="flex items-center mb-8">
-    <img class="w-16 h-16" src="{{ asset('img/logo.png') }}" alt="Logo">
-        <span class="font-bold text-lg">ADMIN PONDOK</span>
+<section class="my-8 p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-3xl text-center text-green-700 font-bold mb-6">Dashboard Potensial</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Total Registrants -->
+        <div class="p-4 bg-blue-100 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold">Total Pendaftar</h3>
+            <p class="text-2xl">{{ $totalPendaftarans }}</p>
+        </div>
+
+        <!-- Accepted and Rejected Applicants -->
+        <div class="p-4 bg-green-100 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold">Status Penerimaan</h3>
+            <p>Diterima: {{ $totalDiterima }}</p>
+            <p>Ditolak: {{ $totalDitolak }}</p>
+        </div>
+
+        <!-- Gender Distribution -->
+        <div class="p-4 bg-yellow-100 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold">Distribusi Jenis Kelamin</h3>
+            <canvas id="genderChart"></canvas>
+        </div>
+
+        <!-- School Distribution -->
+        <div class="p-4 bg-purple-100 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold">Distribusi Asal Sekolah</h3>
+            <canvas id="schoolChart"></canvas>
+        </div>
     </div>
-    <ul class="space-y-4">
-        <li><a href="{{ url('dashboard') }}" class="block hover:bg-green-600 rounded-lg px-4 py-2">Dashboard</a></li>
-        <li><a href="{{ url('admin_data_santri') }}" class="block hover:bg-green-600 rounded-lg px-4 py-2">Data Santri</a></li>
-        <li><a href="{{ url('admin_register') }}" class="block hover:bg-green-600 rounded-lg px-4 py-2">Tambahkan admin</a></li>
-        <li><a href="{{ url('admin_penerimaan') }}" class="block hover:bg-green-600 rounded-lg px-4 py-2">Penerimaan</a></li>
-        
-        <form action="{{ route('logout'); }}" method="post">
-            @csrf
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">LOG OUT</button>
-        </form>
-    </ul>
-    
-</nav>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gender Distribution Chart
+    const genderCtx = document.getElementById('genderChart').getContext('2d');
+    new Chart(genderCtx, {
+        type: 'pie',
+        data: {
+            labels: @json(array_keys($genderDistribution->toArray())),
+            datasets: [{
+                data: @json(array_values($genderDistribution->toArray())),
+                backgroundColor: ['#FF6384', '#36A2EB']
+            }]
+        }
+    });
+
+    // School Distribution Chart
+    const schoolCtx = document.getElementById('schoolChart').getContext('2d');
+    new Chart(schoolCtx, {
+        type: 'bar',
+        data: {
+            labels: @json(array_keys($schoolDistribution->toArray())),
+            datasets: [{
+                data: @json(array_values($schoolDistribution->toArray())),
+                backgroundColor: '#4CAF50'
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: { display: true, text: 'Asal Sekolah' }
+                },
+                y: {
+                    title: { display: true, text: 'Jumlah' },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+@endsection

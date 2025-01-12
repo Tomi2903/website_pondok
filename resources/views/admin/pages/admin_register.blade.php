@@ -10,7 +10,7 @@
         </div>
     @endif
 
-    <form action="{{ route('register') }}" method="POST" class="space-y-4">
+    <form action="{{ route('admin.pendaftaran') }}" method="POST" class="space-y-4">
         @csrf
 
         <div class="form-group">

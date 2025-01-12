@@ -20,4 +20,6 @@ class Pendaftarans extends Model
         "jenis_kelamin"
     ];
 
+    protected $table = 'pendaftaran';
+
 }
