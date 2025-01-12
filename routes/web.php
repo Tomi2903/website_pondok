@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PendaftaranTables;
+use App\Http\Controllers\PendaftaranController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,17 +46,17 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/pendaftaran', 
-    [PendaftaranTables::class, 'create']
+    [PendaftaranController::class, 'create']
 );
 
 Route::get('/profil', function () {
     return view('public.pages.profile');
 });
 
-Route::get('/informasi',    [PendaftaranTables::class, 'index']);
+Route::get('/informasi',    [PendaftaranController::class, 'index']);
 
 
-Route::post('/informasi/save',    [PendaftaranTables::class, 'store'])->name("savep");
+Route::post('/informasi/save',    [PendaftaranController::class, 'store'])->name("savep");
 
 
 Route::get('/testdash', function () {
@@ -69,7 +69,7 @@ Route::get('/admin_penerimaan', function () {
 });
 
 Route::get('/sukses', function () {
-    return view('public.pages.sukses'); // Sesuaikan dengan lokasi file Blade Anda
+    return view('public.pages.sukses');
 })->name('public.pages.sukses');
 
 Route::get('/', function () {
