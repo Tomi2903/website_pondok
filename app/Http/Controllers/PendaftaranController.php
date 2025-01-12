@@ -4,42 +4,34 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pendaftarans;
+use Illuminate\Support\Facades\DB;
 
 class PendaftaranController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-
-        $pendaftaran = Pendaftarans::all();
+        $pendaftaran = DB::table('pendaftaran')
+            ->join('penerimaan', 'pendaftaran.id', '=', 'penerimaan.id_pendaftaran')
+            ->select('pendaftaran.id', 'pendaftaran.nama_santri_baru', 'penerimaan.status_pendaftaran')
+            ->get();
+    
         return view('public.pages.informasi', compact('pendaftaran'));
     }
 
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
+
+
     public function create()
     {
         // Show the form to create a new pendaftaran
         return view('public.pages.pendaftaran');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        // dd($request->all());
+        
         $request->validate([
 
         ]);
@@ -50,63 +42,53 @@ class PendaftaranController extends Controller
                          ->with('success', 'pendaftaran created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\pendaftaran  $pendaftaran
-     * @return \Illuminate\Http\Response
-     */
+
     public function show(Pendaftarans $campaign)
     {
         // Show a single pendaftaran
         return view('pendaftarans.show', compact('pendaftaran'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\pendaftaran  $pendaftaran
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Pendaftarans $campaign)
+    public function edit($id)
     {
-        // Show the form to edit an existing pendaftaran
-        return view('pendaftarans.edit', compact('pendaftaran'));
+        $pendaftaran = Pendaftarans::findOrFail($id);
+    
+        return view('admin.form.datasantriedit', compact('pendaftaran'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\pendaftaran  $pendaftaran
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Pendaftarans $pendaftaran)
+    public function update(Request $request, $id)
     {
-        // Validate and update the pendaftaran
+        $pendaftaran = Pendaftarans::findOrFail($id);
+    
         $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'nama_santri_baru' => 'required|string|max:255',
+            'jenis_kelamin' => 'required',
+            'alamat' => 'required|string',
+            'nama_orang_tua' => 'required|string',
+            'nisn' => 'required|numeric',
+            'asal_sekolah' => 'required|string',
+            'nomor_telepon' => 'required|numeric',
         ]);
-
+    
         $pendaftaran->update($request->all());
-
-        return redirect()->route('pendaftarans.index')
-                         ->with('success', 'pendaftaran updated successfully.');
+    
+        return redirect()->route('admin.data_santri')->with('success', 'Data berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\pendaftaran  $pendaftaran
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Pendaftarans $campaign)
     {
         // Delete the pendaftaran
-        $pendaftaran->delete();
+        $campaign->delete();
 
         return redirect()->route('pendaftarans.index')
                          ->with('success', 'pendaftaran deleted successfully.');
     }
+
+
+    public function getallpendaftaran()
+    {
+        $pendaftaran = Pendaftarans::all();
+        return view('admin.pages.admin_data_santri', compact('pendaftaran'));
+    }
+
 }

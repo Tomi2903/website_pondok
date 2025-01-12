@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('id_pendaftaran');
             $table->string('nama_santri_baru');
-            $table->string('status_pendaftaran');
+            $table->string('status_pendaftaran')->nullable();
             $table->timestamps();
         });
     }
