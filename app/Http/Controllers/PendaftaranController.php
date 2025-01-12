@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pendaftarans;
 
-class PendaftaranTables extends Controller
+class PendaftaranController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,6 +18,7 @@ class PendaftaranTables extends Controller
         $pendaftaran = Pendaftarans::all();
         return view('public.pages.informasi', compact('pendaftaran'));
     }
+
 
     /**
      * Show the form for creating a new resource.

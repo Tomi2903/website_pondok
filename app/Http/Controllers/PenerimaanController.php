@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Models\Penerimaans;
 
-class penerimaan extends Controller
+class penerimaanController extends Controller
 {
 /**
      * Display a listing of the resource.
